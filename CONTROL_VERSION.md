@@ -2,19 +2,22 @@
 
 | Pole | Wartość |
 | :--- | :--- |
-| **Status projektu** | Wczesny prototyp — Vertical Slice 0.1 w toku; stabilny checkpoint obejmuje greybox parteru Detoxu i symulację harmonogramu dnia powszedniego |
-| **Gałąź** | `main` (zsynchronizowana z `origin/main`) |
+| **Status projektu** | Wczesny prototyp — Prototype 0.2 jako zapisany i zweryfikowany checkpoint; obejmuje greybox parteru Detoxu, harmonogram dnia powszedniego oraz działającą kamerę management |
+| **Gałąź** | `main` (do przodu względem `origin/main` o 1 commit — `1348cc0` nie wypchnięty) |
 | **Data aktualizacji dokumentu** | 13.06.2026 |
-| **Aktualny stabilny commit** | `09e83e6` (`09e83e6664687d203325ee2f6a618da40a6e9fc5`) |
-| **Oznaczenie wersji roboczej** | Prototype 0.1 |
+| **Ostatni zapisany commit w repo** | `1348cc0` (`1348cc0ba193d6ae11fbfe9636eab249ca7fbdd4`) — *Add management camera vertical slice for Detox ground floor* |
+| **Aktualny stabilny checkpoint** | `1348cc0` (`1348cc0ba193d6ae11fbfe9636eab249ca7fbdd4`) — *Add management camera vertical slice for Detox ground floor* |
+| **Oznaczenie wersji roboczej** | Prototype 0.2 |
 
 ---
 
 ## 2. Aktualny stabilny checkpoint
 
-**Commit:** `09e83e6` — *Add detox schedule simulation vertical slice*
+**Commit:** `1348cc0` — *Add management camera vertical slice for Detox ground floor*
 
-**Zakres:**
+**Zakres (harmonogram + kamera management):**
+
+### Harmonogram (dziedziczone z `09e83e6`)
 
 - `GameClock` — zegar gry z tickiem minutowym, pauzą, skalowaniem czasu (×1/×2/×4) i zmianą dnia o północy
 - `DailySchedule`, `DailyScheduleEntry`, `ScheduleEventType` — model harmonogramu (aktywności trwające vs zdarzenia punktowe)
@@ -24,17 +27,42 @@
 - Podpięcie systemów w `DetoxPrototype.unity` pod rootami `Systems` i `DebugUI`
 - `Tools/validate_schedule_logic.py` — walidator logiki harmonogramu (offline, Python)
 
-**Weryfikacja:**
+### Kamera management (dodane w `1348cc0`)
 
-- Logikę harmonogramu potwierdza walidator Python (`python3 Tools/validate_schedule_logic.py`).
-- Checkpoint zawiera `ScheduleDebugPanel` przeznaczony do weryfikacji runtime w Unity Play Mode.
-- Checkpoint został ręcznie zweryfikowany w Unity Play Mode 13.06.2026. Potwierdzono poprawną kompilację bez błędów, start harmonogramu o 06:00, pojedynczą emisję zdarzenia ActiveCycleRadio, działanie pauzy, prędkości ×1/×2/×4 i skoku +1h, rozdzielenie aktywności od zdarzeń punktowych oraz zmianę dnia o północy. Weryfikację runtime należy powtarzać przy każdym kolejnym checkpointie zmieniającym scenę lub logikę symulacji.
+- `ManagementCameraController` — [`Assets/_Project/Scripts/Camera/ManagementCameraController.cs`](Assets/_Project/Scripts/Camera/ManagementCameraController.cs), namespace `LasDetox.CameraSystem`
+- Kamera **perspective** ze stałym **pitch** i **yaw** (brak orbitowania i obrotu runtime)
+- Model widoku oparty o **punkt skupienia** (`_focusPoint`) i **odległość zoomu** (`_zoomDistance`) wzdłuż wektora widoku
+- `_initialFocusPoint` i `_initialZoomDistance` jako źródło stanu startowego i resetu (`Home`)
+- Przesuwanie **WASD** i **strzałkami** po płaszczyźnie XZ z wygładzaniem (`SmoothDamp`)
+- Zoom **kółkiem myszy** z limitami min/max i wygładzaniem
+- Ograniczenie ruchu przez serializowane `_boundsMin`, `_boundsMax`, `_boundsPadding` (bez `CameraBounds` / `BoxCollider`)
+- Reset widoku klawiszem **Home**
+- Blokowanie zoomu nad UI (`EventSystem.current.IsPointerOverGameObject()`, null-safe)
+- New Input System przez bezpośredni `InputActionAsset` (`FindActionMap` / `FindAction`) — bez wrappera generowanego C#
+- Mapa `ManagementCamera` w [`Assets/InputSystem_Actions.inputactions`](Assets/InputSystem_Actions.inputactions) — mapy `Player` i `UI` nietknięte
+- Podpięcie kontrolera na `Main Camera` w `DetoxPrototype.unity`
+- Brak Cinemachine, GameManagera, bootstrapu i obiektu `CameraBounds`
+
+**Weryfikacja (13.06.2026, Unity Play Mode):**
+
+- Unity kompiluje projekt bez błędów
+- Scena `DetoxPrototype.unity` uruchamia się w Play Mode
+- Kamera pokazuje greybox parteru Detoxu
+- Przesuwanie WASD i strzałkami działa
+- Zoom kółkiem myszy działa
+- Reset widoku klawiszem `Home` działa
+- Kamera zachowuje stały pitch i yaw
+- `ScheduleDebugPanel` nadal działa
+- Harmonogram nadal pracuje i emituje zdarzenia
+- Logikę harmonogramu potwierdza walidator Python (`python3 Tools/validate_schedule_logic.py`)
+
+**Wcześniejszy checkpoint harmonogramu:** `09e83e6` — *Add detox schedule simulation vertical slice* (zastąpiony jako główny checkpoint przez `1348cc0`, zachowany w historii).
 
 ---
 
 ## 3. Potwierdzone działające elementy
 
-Poniższe elementy są obecne w repozytorium na commicie `09e83e6`:
+Poniższe elementy są obecne w repozytorium na checkpointcie `1348cc0`:
 
 | Obszar | Stan |
 | :--- | :--- |
@@ -51,8 +79,16 @@ Poniższe elementy są obecne w repozytorium na commicie `09e83e6`:
 | **Aktywności trwające i zdarzenia punktowe** | `DurationMinutes > 0` → aktywność; `DurationMinutes = 0` → zdarzenie punktowe (nie staje się `CurrentActivity`) |
 | **Zmiana dnia o północy** | `GameClock.AdvanceMinute` — `_hour >= 24` → `_hour = 0`, `_day++` |
 | **Cisza nocna przez północ** | `QuietHours` (480 min od 22:00) — `DailySchedule.IsMinuteWithinActivity` z wrap (`end > 1440`) |
+| **`ManagementCameraController`** | Kamera management na `Main Camera`; namespace `LasDetox.CameraSystem`; transform runtime wyliczany z focusu, zoomu, pitch i yaw |
+| **Mapa input `ManagementCamera`** | Akcje `Pan`, `Zoom`, `Reset` w `InputSystem_Actions.inputactions` |
+| **Pan WASD i strzałkami** | Przesuwanie po XZ z wygładzaniem |
+| **Zoom kółkiem** | Zoom z limitami min/max i wygładzaniem |
+| **Reset Home** | Przywraca `_initialFocusPoint` i `_initialZoomDistance` |
+| **Stała rotacja kamery** | Stały pitch i yaw — brak orbitowania i obrotu runtime |
+| **Serializowane bounds kamery** | `_boundsMin`, `_boundsMax`, `_boundsPadding` — bez collidera / `CameraBounds` |
+| **Brak regresji harmonogramu** | `ScheduleDebugPanel` i harmonogram działają podczas testu Play Mode |
 
-**Poza zakresem checkpointu (brak w repo):** Patient AI, NavMesh, system potrzeb, kolejki, konflikty, docelowe wyposażenie, produkcyjny HUD, ekonomia, przyjęcia/wypisy, kalendarz niedziel i świąt.
+**Poza zakresem (brak w repo):** Patient AI, NavMesh, system potrzeb, kolejki, konflikty, docelowe wyposażenie, produkcyjny HUD, ekonomia, przyjęcia/wypisy, kalendarz niedziel i świąt. Wdrożenie kamery **nie oznacza** rozpoczęcia żadnego z tych systemów.
 
 ---
 
@@ -60,13 +96,13 @@ Poniższe elementy są obecne w repozytorium na commicie `09e83e6`:
 
 **Główna scena:** `Assets/_Project/Scenes/DetoxPrototype.unity`
 
-Scena jest **composition rootem** pierwszego vertical slice — systemy gry są podpięte bezpośrednio w hierarchii sceny, bez osobnego bootstrapu ani `GameManager`.
+Scena jest **composition rootem** vertical slice — systemy gry są podpięte bezpośrednio w hierarchii sceny, bez osobnego bootstrapu ani `GameManager`.
 
 **Rooty sceny (poziom 0):**
 
 | Root | Zawartość |
 | :--- | :--- |
-| `Main Camera` | Kamera prototypu |
+| `Main Camera` | `Camera`, `AudioListener`, `ManagementCameraController` — transform runtime wyliczany przez kontroler z punktu skupienia, odległości zoomu, pitch i yaw |
 | `Directional Light` | Oświetlenie |
 | `Environment` | `Ground Placeholder` + `Rooms` (greybox parteru) |
 | `Props` | Kontener na rekwizyty (obecnie pusty) |
@@ -75,11 +111,45 @@ Scena jest **composition rootem** pierwszego vertical slice — systemy gry są 
 
 **`Environment/Rooms`:** Detox Common Room, Corridor Vertical, Corridor Horizontal, Nurse Station, Laundry, Patient Room 1–4, Shared Walls.
 
+Obiekt `CameraBounds` **nie istnieje** w scenie.
+
 ---
 
-## 5. Aktualne narzędzia developerskie
+## 5. Input System
 
-Katalog `Tools/` zawiera wyłącznie:
+| Element | Stan |
+| :--- | :--- |
+| **Pakiet** | `com.unity.inputsystem` 1.19.0 |
+| **ProjectSettings** | `activeInputHandler: 1` — wyłącznie New Input System |
+| **Asset** | [`Assets/InputSystem_Actions.inputactions`](Assets/InputSystem_Actions.inputactions) |
+
+**Mapy w assetcie:**
+
+| Mapa | Stan |
+| :--- | :--- |
+| `Player` | Szablon Unity — **nietknięty** |
+| `UI` | Szablon Unity (`ScrollWheel` itd.) — **nietknięty**; `ScheduleDebugPanel` tworzy runtime `EventSystem` + `InputSystemUIInputModule` |
+| `ManagementCamera` | Akcje `Pan` (WASD + strzałki), `Zoom` (`<Mouse>/scroll/y`), `Reset` (`<Keyboard>/home`) |
+
+`ManagementCameraController` używa bezpośredniej referencji `InputActionAsset` z `FindActionMap` / `FindAction`. Brak wrappera generowanego C#.
+
+---
+
+## 6. Struktura kodu i narzędzia developerskie
+
+### Skrypty gameplay (`Assets/_Project/Scripts/`)
+
+| Skrypt | Namespace | Opis |
+| :--- | :--- | :--- |
+| `Time/GameClock.cs` | `LasDetox.Time` | Zegar gry |
+| `Schedule/DailySchedule.cs` | `LasDetox.Schedule` | Model harmonogramu (SO) |
+| `Schedule/DailyScheduleEntry.cs` | `LasDetox.Schedule` | Wpis harmonogramu |
+| `Schedule/ScheduleEventType.cs` | `LasDetox.Schedule` | Typ zdarzenia |
+| `Schedule/ScheduleRunner.cs` | `LasDetox.Schedule` | Runner harmonogramu |
+| `Debug/ScheduleDebugPanel.cs` | `LasDetox.Debugging` | Panel debugowy uGUI |
+| `Camera/ManagementCameraController.cs` | `LasDetox.CameraSystem` | Kamera management |
+
+### Narzędzia (`Tools/`)
 
 | Narzędzie | Plik | Opis |
 | :--- | :--- | :--- |
@@ -103,7 +173,7 @@ Narzędzia **nie uruchamiają** Unity i **nie modyfikują** plików projektu.
 
 ---
 
-## 6. Elementy jeszcze niewykonane
+## 7. Elementy jeszcze niewykonane
 
 Najważniejsze systemy poza aktualnym checkpointem (planowane, niezaimplementowane):
 
@@ -120,23 +190,24 @@ Najważniejsze systemy poza aktualnym checkpointem (planowane, niezaimplementowa
 
 ---
 
-## 7. Pliki świadomie poza commitami
+## 8. Stan working tree
 
-Stan working tree na **13.06.2026** (należy każdorazowo zweryfikować przez `git status` — może się zmienić):
+Stan na **13.06.2026** (zweryfikować przez `git status`):
 
 | Plik / katalog | Status | Uwagi |
 | :--- | :--- | :--- |
-| `.cursor/` | Nieśledzony | Plany i konfiguracja IDE Cursor — lokalne, nie commitować bez decyzji Operatora |
-| `ProjectSettings/ShaderGraphSettings.asset` | Zmodyfikowany lokalnie | Zmiana generowana/odkrywana przez edytor Unity — sprawdzić diff przed ewentualnym dodaniem |
+| `CONTROL_VERSION.md` | Zmodyfikowany | Niniejsza aktualizacja — oczekuje na commit dokumentacyjny |
+| `ProjectSettings/ShaderGraphSettings.asset` | Zmodyfikowany lokalnie | Artefakt edytora Unity — poza zakresem |
+| `.cursor/` | Nieśledzony | Plany i konfiguracja IDE Cursor — lokalne, nie commitować |
 | `ProjectSettings/SceneTemplateSettings.json` | Nieśledzony | Plik ustawień edytora — typowo lokalny artefakt |
+
+Pliki implementacji kamery (`ManagementCameraController`, `InputSystem_Actions`, `DetoxPrototype.unity`) są zapisane w commicie `1348cc0` i **nie oczekują** na commit.
 
 **Zasada:** Nie używać `git add .`. Dodawać pliki precyzyjnie, po przejrzeniu `git status` i `git diff`.
 
-Ten dokument (`CONTROL_VERSION.md`) po utworzeniu również wymaga świadomego dodania do commita, jeśli Operator zdecyduje o jego wersjonowaniu.
-
 ---
 
-## 8. Procedura bezpiecznego commita
+## 9. Procedura bezpiecznego commita
 
 1. Zakończyć **Play Mode** w Unity (jeśli był aktywny).
 2. Zapisać scenę (`Ctrl+S` / *File → Save*).
@@ -154,7 +225,7 @@ Nie używać automatycznie `git add .`
 
 ---
 
-## 9. Procedura rollbacku
+## 10. Procedura rollbacku
 
 **Przed rollbackiem:** sprawdzić `git status`, zabezpieczyć niezacommitowane zmiany (`git stash` lub osobna gałąź robocza).
 
@@ -176,7 +247,13 @@ git show <commit>
 git switch -c recovery/<nazwa> <commit>
 ```
 
-Przykład powrotu do aktualnego stabilnego checkpointu:
+Przykład powrotu do aktualnego checkpointu Prototype 0.2:
+
+```bash
+git switch -c recovery/management-camera-slice 1348cc0
+```
+
+Przykład powrotu do wcześniejszego checkpointu harmonogramu:
 
 ```bash
 git switch -c recovery/schedule-slice 09e83e6
@@ -186,7 +263,7 @@ git switch -c recovery/schedule-slice 09e83e6
 
 ---
 
-## 10. Zasady dla agentów
+## 11. Zasady dla agentów
 
 1. **Agent nie decyduje o architekturze** bez zatwierdzenia Operatora.
 2. **Agent wykonuje tylko wskazany zakres** — bez rozszerzania zakresu „dla wygody”.
@@ -200,11 +277,13 @@ git switch -c recovery/schedule-slice 09e83e6
 
 ---
 
-## 11. Historia kluczowych checkpointów
+## 12. Historia kluczowych checkpointów
 
 | Commit | Opis | Znaczenie | Status |
 | :--- | :--- | :--- | :--- |
-| `09e83e6` | Add detox schedule simulation vertical slice | Pierwszy działający vertical slice: zegar gry, harmonogram dnia powszedniego, runner, panel debugowy, walidator Python | **Aktualny stabilny checkpoint** |
+| `1348cc0` | Add management camera vertical slice for Detox ground floor | Prototype 0.2: kamera management, mapa `ManagementCamera`, podpięcie na `Main Camera`; dziedziczy zakres harmonogramu | **Aktualny stabilny checkpoint — Prototype 0.2** |
+| `9afb4d9` | Add project version control document | Dokument `CONTROL_VERSION.md` | Potwierdzony |
+| `09e83e6` | Add detox schedule simulation vertical slice | Pierwszy działający vertical slice: zegar gry, harmonogram dnia powszedniego, runner, panel debugowy, walidator Python | Wcześniejszy checkpoint harmonogramu |
 | `8f090d6` | Add Unity scene layout reporting tool | Narzędzie `scene_layout_report.py` do audytu layoutu sceny bez Unity | Potwierdzony |
 | `da30738` | Document and finalize detox ground floor greybox | Finalizacja greyboxu + `Dokumenty/PLAN_PARTERU_DETOX.md` | Potwierdzony |
 | `d123a76` | Reorganize detox room hierarchy | Uporządkowana hierarchia `Environment/Rooms` (kontenery per pomieszczenie) | Potwierdzony |
@@ -214,6 +293,11 @@ git switch -c recovery/schedule-slice 09e83e6
 
 ---
 
-## 12. Następny bezpieczny krok
+## 13. Następny bezpieczny krok
 
-> Kolejny system powinien powstawać jako osobny, mały vertical slice na bazie aktualnego stabilnego checkpointu.
+1. Zaktualizować i zacommitować `CONTROL_VERSION.md` (niniejsza wersja dokumentu).
+2. Wypchnąć commity (`9afb4d9` dokumentacji + `1348cc0` kamery, oraz commit dokumentacyjny) — dopiero po decyzji Operatora.
+3. Potwierdzić świadomie nieczysty working tree (artefakty edytora poza zakresem).
+4. Wybrać kolejny mały vertical slice na bazie checkpointu `1348cc0`.
+
+> Kolejny system gameplay powinien powstawać jako osobny, mały vertical slice na bazie aktualnego stabilnego checkpointu `1348cc0`.
