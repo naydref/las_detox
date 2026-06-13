@@ -2,22 +2,55 @@
 
 | Pole | Wartość |
 | :--- | :--- |
-| **Status projektu** | Wczesny prototyp — Prototype 0.3A (Patient Data Loader) zaimplementowany lokalnie; oczekuje commita i weryfikacji Play Mode |
-| **Gałąź** | `main` (zsynchronizowany z `origin/main` na commicie `d9cae49`; implementacja 0.3A niezacommitowana) |
+| **Status projektu** | Wczesny prototyp — Prototype 0.3B (Patient Roster UI v0.1) zaimplementowany i zweryfikowany w Play Mode; oczekuje commita checkpointu |
+| **Gałąź** | `main` (zsynchronizowany z `origin/main` na commicie `17634f9`; implementacja 0.3B niezacommitowana) |
 | **Data aktualizacji dokumentu** | 13.06.2026 |
-| **Ostatni zapisany commit w repo** | `d9cae49` (`d9cae49…`) — *Update control version for Prototype 0.2 checkpoint* |
-| **Aktualny stabilny checkpoint** | `d9cae49` — dokumentacja Prototype 0.2; ostatni commit implementacyjny: `1348cc0` (kamera management) |
-| **Oznaczenie wersji roboczej** | Prototype 0.3A — Patient Data Loader v0.1 (lokalnie) |
+| **Ostatni zapisany commit w repo** | `17634f9` (`17634f9…`) — *Add patient data loader vertical slice* |
+| **Aktualny stabilny checkpoint** | `17634f9` — Prototype 0.3A (Patient Data Loader); wersja robocza 0.3B zweryfikowana lokalnie, niezacommitowana |
+| **Oznaczenie wersji roboczej** | Prototype 0.3B — Patient Roster UI v0.1 (lokalnie, Play Mode verified) |
 
 ---
 
 ## 2. Aktualny stabilny checkpoint
 
-**Ostatni zapisany commit implementacyjny:** `1348cc0` — *Add management camera vertical slice for Detox ground floor*
+**Ostatni zapisany commit implementacyjny:** `17634f9` — *Add patient data loader vertical slice*
 
-**Wersja robocza (niezacommitowana):** Prototype 0.3A — Patient Data Loader v0.1
+**Wersja robocza (niezacommitowana):** Prototype 0.3B — Patient Roster UI v0.1
 
-### Patient Data Loader (Prototype 0.3A — lokalnie)
+**Status Prototype 0.3B:**
+
+- implemented
+- Play Mode verified
+- ready for checkpoint commit
+
+### Patient Roster UI (Prototype 0.3B — lokalnie)
+
+- Runtime uGUI Patient Roster — root `GameUI` → `PatientRosterPanel`
+- Lista pacjentów z automatycznym zaznaczeniem pierwszego wpisu; kliknięcie zmienia szczegóły
+- Panel szczegółów wybranego pacjenta (read-only)
+- Polskie formatowanie danych — [`Assets/_Project/Scripts/UI/PatientDisplayFormatting.cs`](Assets/_Project/Scripts/UI/PatientDisplayFormatting.cs)
+- [`Assets/_Project/Scripts/UI/PatientRosterPanel.cs`](Assets/_Project/Scripts/UI/PatientRosterPanel.cs) — namespace `LasDetox.UI`
+- Mapa input `GameUI` w [`Assets/InputSystem_Actions.inputactions`](Assets/InputSystem_Actions.inputactions) — `TogglePatientRoster` (`P`), `ClosePatientRoster` (`Escape`)
+- `P` toggle otwarcia/zamknięcia panelu; `Escape` tylko zamyka; przycisk „Zamknij”
+- Blokada kamery przez `ManagementCameraController.SetInputEnabled(bool)` przy otwartym panelu
+- Idempotentny `EventSystem` — jeden `EventSystem` w scenie (brak duplikatu z `ScheduleDebugPanel`)
+- Empty state i error state w panelu
+- Null-safe referencja do `PatientDataLoader`
+- Pola ukryte nie są wyświetlane; brak kontaktu alarmowego formatowany poprawnie; `charming` → „Czarujący”
+
+**Weryfikacja 0.3B (13.06.2026, Unity Play Mode):**
+
+- `[PatientData] Loaded 3 patients, 0 errors.`
+- Panel otwiera się klawiszem `P`; ponowne `P` zamyka panel
+- `Escape` tylko zamyka panel; przycisk „Zamknij” działa
+- Lista pokazuje 3 pacjentów w poprawnej kolejności; pierwszy zaznaczony automatycznie
+- Kliknięcie wpisu zmienia szczegóły; polskie etykiety i formatowanie działają
+- Kamera blokowana przy otwartym panelu; przywracana po zamknięciu
+- Istnieje tylko jeden `EventSystem`
+- Harmonogram i `ScheduleDebugPanel` działają bez regresji
+- Kamera działa normalnie przy zamkniętym panelu
+
+### Patient Data Loader (Prototype 0.3A — `17634f9`)
 
 - `PatientDataLoader` — [`Assets/_Project/Scripts/Patients/PatientDataLoader.cs`](Assets/_Project/Scripts/Patients/PatientDataLoader.cs), namespace `LasDetox.Patients`
 - `PatientDefinitionDto`, `PatientCatalogDto`, `PatientDefinitionValidator` — deserializacja `JsonUtility`, walidacja sekcji/stringów/enumów/zakresów
@@ -27,13 +60,6 @@
 - `TextAsset` + jawne referencje w Inspectorze na `Systems` → `PatientDataLoader`
 - Loader: jednorazowa deserializacja → `Dictionary<string, PatientDefinitionDto>` → iteracja katalogu → `ValidPatients` + log podsumowania
 - **Granica JsonUtility v0.1:** walidator nie wykrywa brakujących kluczy liczbowych/boolean vs `0`/`false`
-- **Bez zmian:** Input System, kamera, UI, przyjęcia, runtime state pacjenta
-
-**Weryfikacja 0.3A (13.06.2026):**
-
-- Offline: struktura JSON 3 pacjentów OK (Python smoke test)
-- Unity batch compile: niedostępny (projekt otwarty w edytorze) — **wymagany Play Mode w Unity**
-- Oczekiwany log: `[PatientData] Loaded 3 patients, 0 errors.`
 
 **Checkpoint Prototype 0.2 (`1348cc0` / `d9cae49`):**
 
@@ -47,7 +73,7 @@
 - Podpięcie systemów w `DetoxPrototype.unity` pod rootami `Systems` i `DebugUI`
 - `Tools/validate_schedule_logic.py` — walidator logiki harmonogramu (offline, Python)
 
-### Kamera management (dodane w `1348cc0`)
+### Kamera management (dodane w `1348cc0`, rozszerzone w 0.3B)
 
 - `ManagementCameraController` — [`Assets/_Project/Scripts/Camera/ManagementCameraController.cs`](Assets/_Project/Scripts/Camera/ManagementCameraController.cs), namespace `LasDetox.CameraSystem`
 - Kamera **perspective** ze stałym **pitch** i **yaw** (brak orbitowania i obrotu runtime)
@@ -58,12 +84,13 @@
 - Ograniczenie ruchu przez serializowane `_boundsMin`, `_boundsMax`, `_boundsPadding` (bez `CameraBounds` / `BoxCollider`)
 - Reset widoku klawiszem **Home**
 - Blokowanie zoomu nad UI (`EventSystem.current.IsPointerOverGameObject()`, null-safe)
+- `SetInputEnabled(bool)` — blokada inputu kamery przy otwartym panelu pacjentów (0.3B)
 - New Input System przez bezpośredni `InputActionAsset` (`FindActionMap` / `FindAction`) — bez wrappera generowanego C#
 - Mapa `ManagementCamera` w [`Assets/InputSystem_Actions.inputactions`](Assets/InputSystem_Actions.inputactions) — mapy `Player` i `UI` nietknięte
 - Podpięcie kontrolera na `Main Camera` w `DetoxPrototype.unity`
 - Brak Cinemachine, GameManagera, bootstrapu i obiektu `CameraBounds`
 
-**Weryfikacja (13.06.2026, Unity Play Mode):**
+**Weryfikacja kamery i harmonogramu (13.06.2026, Unity Play Mode):**
 
 - Unity kompiluje projekt bez błędów
 - Scena `DetoxPrototype.unity` uruchamia się w Play Mode
@@ -82,7 +109,7 @@
 
 ## 3. Potwierdzone działające elementy
 
-Poniższe elementy są obecne w repozytorium na checkpointcie `1348cc0`:
+Poniższe elementy są obecne w repozytorium na checkpointcie `17634f9` oraz w lokalnej implementacji 0.3B:
 
 | Obszar | Stan |
 | :--- | :--- |
@@ -99,7 +126,7 @@ Poniższe elementy są obecne w repozytorium na checkpointcie `1348cc0`:
 | **Aktywności trwające i zdarzenia punktowe** | `DurationMinutes > 0` → aktywność; `DurationMinutes = 0` → zdarzenie punktowe (nie staje się `CurrentActivity`) |
 | **Zmiana dnia o północy** | `GameClock.AdvanceMinute` — `_hour >= 24` → `_hour = 0`, `_day++` |
 | **Cisza nocna przez północ** | `QuietHours` (480 min od 22:00) — `DailySchedule.IsMinuteWithinActivity` z wrap (`end > 1440`) |
-| **`ManagementCameraController`** | Kamera management na `Main Camera`; namespace `LasDetox.CameraSystem`; transform runtime wyliczany z focusu, zoomu, pitch i yaw |
+| **`ManagementCameraController`** | Kamera management na `Main Camera`; namespace `LasDetox.CameraSystem`; transform runtime wyliczany z focusu, zoomu, pitch i yaw; `SetInputEnabled(bool)` |
 | **Mapa input `ManagementCamera`** | Akcje `Pan`, `Zoom`, `Reset` w `InputSystem_Actions.inputactions` |
 | **Pan WASD i strzałkami** | Przesuwanie po XZ z wygładzaniem |
 | **Zoom kółkiem** | Zoom z limitami min/max i wygładzaniem |
@@ -107,10 +134,19 @@ Poniższe elementy są obecne w repozytorium na checkpointcie `1348cc0`:
 | **Stała rotacja kamery** | Stały pitch i yaw — brak orbitowania i obrotu runtime |
 | **Serializowane bounds kamery** | `_boundsMin`, `_boundsMax`, `_boundsPadding` — bez collidera / `CameraBounds` |
 | **`PatientDataLoader`** | Ładuje katalog + 3 definicje JSON; walidacja; `ValidPatients` w kolejności katalogu; log `[PatientData] Loaded N patients, E errors.` |
-| **Dane pacjentów v0.1** | JSON w `Assets/_Project/Data/Patients/`; katalog ID; 3 testowe definicje |
-| **Brak regresji harmonogramu / kamery / debug UI** | Zakres 0.3A nie modyfikuje istniejących systemów poza dodaniem komponentu na `Systems` |
+| **Dane pacjentów v0.1** | JSON w `Assets/_Project/Data/Patients/`; katalog ID; 3 testowe definicje; DTO; walidator; loader; UI read-only |
+| **`PatientRosterPanel`** | Runtime uGUI — lista pacjentów, szczegóły, toggle `P`, close `Escape`, empty/error state |
+| **`PatientDisplayFormatting`** | Polskie etykiety i formatowanie pól pacjenta (np. `charming` → „Czarujący”) |
+| **Mapa input `GameUI`** | `TogglePatientRoster` (`P`), `ClosePatientRoster` (`Escape`) |
+| **3 pacjentów załadowanych bez błędów** | `[PatientData] Loaded 3 patients, 0 errors.` |
+| **Lista i wybór pacjenta** | 3 wpisy w kolejności katalogu; auto-select pierwszego; klik zmienia szczegóły |
+| **Pełny panel szczegółów** | Polskie etykiety; pola ukryte niewidoczne; brak kontaktu alarmowego formatowany poprawnie |
+| **Kamera blokowana i przywracana** | `SetInputEnabled(false)` przy otwartym panelu; normalna praca po zamknięciu |
+| **Brak regresji harmonogramu** | `GameClock`, `ScheduleRunner` — bez zmian w zachowaniu |
+| **Brak regresji `ScheduleDebugPanel`** | Panel debugowy działa przy otwartym i zamkniętym rosterze |
+| **Jeden `EventSystem`** | Idempotentna inicjalizacja — brak duplikatu |
 
-**Poza zakresem (brak w repo):** Patient Roster UI (0.3B), Patient AI, NavMesh, system potrzeb, kolejki, konflikty, docelowe wyposażenie, produkcyjny HUD, ekonomia, przyjęcia/wypisy, kalendarz niedziel i świąt.
+**Poza zakresem (brak w repo):** PatientAdmission, runtime state pacjenta, pokoje i łóżka, system potrzeb, Patient AI, NavMesh, kolejki, konflikty, refundacja, ukryte cechy i ich odkrywanie, edycja pacjentów, wyszukiwanie/filtrowanie/sortowanie, portrety, zapis gry, produkcyjny skin UI, docelowe wyposażenie, ekonomia, pełny kalendarz niedziel i świąt.
 
 ---
 
@@ -130,6 +166,7 @@ Scena jest **composition rootem** vertical slice — systemy gry są podpięte b
 | `Props` | Kontener na rekwizyty (obecnie pusty) |
 | `Systems` | `GameClock` + `ScheduleRunner` + `PatientDataLoader` (jeden GameObject, trzy komponenty) |
 | `DebugUI` | `ScheduleDebugPanel` (tworzy `DebugCanvas` w runtime) |
+| `GameUI` | `PatientRosterPanel` — runtime uGUI panelu pacjentów |
 
 **`Environment/Rooms`:** Detox Common Room, Corridor Vertical, Corridor Horizontal, Nurse Station, Laundry, Patient Room 1–4, Shared Walls.
 
@@ -150,10 +187,17 @@ Obiekt `CameraBounds` **nie istnieje** w scenie.
 | Mapa | Stan |
 | :--- | :--- |
 | `Player` | Szablon Unity — **nietknięty** |
-| `UI` | Szablon Unity (`ScrollWheel` itd.) — **nietknięty**; `ScheduleDebugPanel` tworzy runtime `EventSystem` + `InputSystemUIInputModule` |
+| `UI` | Szablon Unity (`ScrollWheel` itd.) — **nietknięty** |
 | `ManagementCamera` | Akcje `Pan` (WASD + strzałki), `Zoom` (`<Mouse>/scroll/y`), `Reset` (`<Keyboard>/home`) |
+| `GameUI` | `TogglePatientRoster` (`P`), `ClosePatientRoster` (`Escape`) |
 
-`ManagementCameraController` używa bezpośredniej referencji `InputActionAsset` z `FindActionMap` / `FindAction`. Brak wrappera generowanego C#.
+```text
+GameUI
+├── TogglePatientRoster → P
+└── ClosePatientRoster → Escape
+```
+
+`ManagementCameraController` i `PatientRosterPanel` używają bezpośredniej referencji `InputActionAsset` z `FindActionMap` / `FindAction`. Brak wrappera generowanego C#. Jeden `EventSystem` w scenie (idempotentna inicjalizacja).
 
 ---
 
@@ -169,11 +213,13 @@ Obiekt `CameraBounds` **nie istnieje** w scenie.
 | `Schedule/ScheduleEventType.cs` | `LasDetox.Schedule` | Typ zdarzenia |
 | `Schedule/ScheduleRunner.cs` | `LasDetox.Schedule` | Runner harmonogramu |
 | `Debug/ScheduleDebugPanel.cs` | `LasDetox.Debugging` | Panel debugowy uGUI |
-| `Camera/ManagementCameraController.cs` | `LasDetox.CameraSystem` | Kamera management |
+| `Camera/ManagementCameraController.cs` | `LasDetox.CameraSystem` | Kamera management; `SetInputEnabled(bool)` |
 | `Patients/PatientDataLoader.cs` | `LasDetox.Patients` | Loader danych pacjentów z JSON |
 | `Patients/PatientDefinitionDto.cs` | `LasDetox.Patients` | DTO definicji pacjenta |
 | `Patients/PatientCatalogDto.cs` | `LasDetox.Patients` | DTO katalogu ID |
 | `Patients/PatientDefinitionValidator.cs` | `LasDetox.Patients` | Walidacja definicji i katalogu |
+| `UI/PatientRosterPanel.cs` | `LasDetox.UI` | Panel listy i szczegółów pacjentów |
+| `UI/PatientDisplayFormatting.cs` | `LasDetox.UI` | Polskie formatowanie danych pacjenta |
 
 ### Narzędzia (`Tools/`)
 
@@ -203,16 +249,22 @@ Narzędzia **nie uruchamiają** Unity i **nie modyfikują** plików projektu.
 
 Najważniejsze systemy poza aktualnym checkpointem (planowane, niezaimplementowane):
 
-- **Patient Roster UI** — panel listy i szczegółów (Prototype 0.3B)
+- **PatientAdmission** — przyjęcia i wypisy pacjentów
+- **Runtime state pacjenta** — stan dynamiczny w trakcie gry
+- **Pokoje i łóżka** — przypisanie pacjentów do miejsc
+- **System potrzeb** — głód, stres, uzależnienie itd.
 - **Patient AI** — zachowanie i decyzje pacjentów
 - **NavMesh i poruszanie postaci** — locomotion, pathfinding
-- **System potrzeb** — głód, stres, uzależnienie itd.
 - **Kolejki** — np. kawa przy dyżurce
 - **Konflikty** — źródła napięcia z README
+- **Refundacja / ekonomia** — budżet, zakupy
+- **Ukryte cechy i ich odkrywanie** — mechanika odkrywania traitów
+- **Edycja pacjentów** — modyfikacja danych w runtime
+- **Wyszukiwanie, filtrowanie, sortowanie** — rozszerzenia UI rosteru
+- **Portrety pacjentów** — grafika w panelu
+- **Zapis gry** — persystencja stanu
+- **Produkcyjny skin UI** — docelowy interfejs zamiast prototypowego uGUI
 - **Właściwe wyposażenie** — meble, drzwi, sprzęt medyczny zamiast greyboxu
-- **Docelowy HUD** — interfejs produkcyjny (obecnie tylko panel debugowy)
-- **Ekonomia** — budżet, refundacja, zakupy
-- **Przyjęcia i wypisy** — skierowania, kolejka łóżek
 - **Pełny kalendarz niedziel i świąt** — osobny harmonogram (TODO w README)
 
 ---
@@ -223,15 +275,16 @@ Stan na **13.06.2026** (zweryfikować przez `git status`):
 
 | Plik / katalog | Status | Uwagi |
 | :--- | :--- | :--- |
-| `CONTROL_VERSION.md` | Zmodyfikowany | Aktualizacja Prototype 0.3A — oczekuje na commit dokumentacyjny |
-| `Assets/_Project/Data/Patients/` | Nieśledzony | Implementacja 0.3A — JSON + README |
-| `Assets/_Project/Scripts/Patients/` | Nieśledzony | Implementacja 0.3A — 4 skrypty C# |
-| `Assets/_Project/Scenes/DetoxPrototype.unity` | Zmodyfikowany | `PatientDataLoader` na `Systems` |
+| `CONTROL_VERSION.md` | Zmodyfikowany | Aktualizacja Prototype 0.3B — oczekuje na commit dokumentacyjny |
+| `Assets/_Project/Scripts/UI/` | Nieśledzony | Implementacja 0.3B — `PatientRosterPanel`, `PatientDisplayFormatting` |
+| `Assets/_Project/Scenes/DetoxPrototype.unity` | Zmodyfikowany | Root `GameUI` → `PatientRosterPanel`; `PatientDataLoader` na `Systems` |
+| `Assets/_Project/Scripts/Camera/ManagementCameraController.cs` | Zmodyfikowany | `SetInputEnabled(bool)` — blokada kamery (0.3B) |
+| `Assets/InputSystem_Actions.inputactions` | Zmodyfikowany | Mapa `GameUI` — `TogglePatientRoster`, `ClosePatientRoster` |
 | `ProjectSettings/ShaderGraphSettings.asset` | Zmodyfikowany lokalnie | Artefakt edytora Unity — poza zakresem |
 | `.cursor/` | Nieśledzony | Plany Cursor — lokalne, nie commitować |
 | `ProjectSettings/SceneTemplateSettings.json` | Nieśledzony | Artefakt edytora — poza zakresem |
 
-Implementacja 0.3A **oczekuje** na precyzyjny commit (patrz plan — bez `git add .`).
+Implementacja 0.3B **oczekuje** na precyzyjny commit (bez `git add .`).
 
 **Zasada:** Nie używać `git add .`. Dodawać pliki precyzyjnie, po przejrzeniu `git status` i `git diff`.
 
@@ -277,7 +330,13 @@ git show <commit>
 git switch -c recovery/<nazwa> <commit>
 ```
 
-Przykład powrotu do aktualnego checkpointu Prototype 0.2:
+Przykład powrotu do aktualnego checkpointu Prototype 0.3A:
+
+```bash
+git switch -c recovery/patient-data-loader 17634f9
+```
+
+Przykład powrotu do checkpointu Prototype 0.2:
 
 ```bash
 git switch -c recovery/management-camera-slice 1348cc0
@@ -311,7 +370,8 @@ git switch -c recovery/schedule-slice 09e83e6
 
 | Commit | Opis | Znaczenie | Status |
 | :--- | :--- | :--- | :--- |
-| *(pending)* | Add patient data loader vertical slice (Prototype 0.3A) | JSON katalog + 3 definicje, loader, walidator, scena | **Roboczy — niezacommitowany** |
+| *(pending)* | Add patient roster UI vertical slice (Prototype 0.3B) | Runtime uGUI roster, `GameUI` input, blokada kamery, polskie formatowanie | **Roboczy — niezacommitowany, Play Mode verified** |
+| `17634f9` | Add patient data loader vertical slice | Prototype 0.3A: JSON katalog + 3 definicje, loader, walidator, scena | Potwierdzony |
 | `d9cae49` | Update control version for Prototype 0.2 checkpoint | Dokumentacja checkpointu 0.2 | Potwierdzony |
 | `1348cc0` | Add management camera vertical slice for Detox ground floor | Prototype 0.2: kamera management | Potwierdzony |
 | `9afb4d9` | Add project version control document | Dokument `CONTROL_VERSION.md` | Potwierdzony |
@@ -327,9 +387,6 @@ git switch -c recovery/schedule-slice 09e83e6
 
 ## 13. Następny bezpieczny krok
 
-1. **Play Mode w Unity** — potwierdzić log `[PatientData] Loaded 3 patients, 0 errors.` oraz brak regresji harmonogramu/debug/kamery.
-2. Zacommitować implementację 0.3A precyzyjnym `git add` (patrz plan Prototype 0.3A).
-3. Zacommitować `CONTROL_VERSION.md` (osobny commit dokumentacyjny lub po akceptacji Operatora).
-4. Wybrać **Prototype 0.3B — Patient Roster UI** jako kolejny slice po zamknięciu 0.3A.
-
-> Kolejny slice UI powinien czytać `PatientDataLoader.ValidPatients` bez zmiany loadera.
+1. Zacommitować implementację 0.3B precyzyjnym `git add` (patrz plan Prototype 0.3B).
+2. Zacommitować `CONTROL_VERSION.md` (osobny commit dokumentacyjny lub po akceptacji Operatora).
+3. **Prototype 0.4 — do ustalenia** — następny etap wymaga osobnej decyzji Operatora (PatientAdmission, runtime state, AI, potrzeby, pokoje i łóżka — bez automatycznego wyboru).
