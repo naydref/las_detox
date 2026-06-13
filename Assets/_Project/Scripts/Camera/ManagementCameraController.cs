@@ -53,6 +53,7 @@ namespace LasDetox.CameraSystem
         private Vector3 _panVelocity;
         private float _zoomVelocity;
         private Quaternion _viewRotation;
+        private bool _inputEnabled = true;
 
         private void Awake()
         {
@@ -70,12 +71,18 @@ namespace LasDetox.CameraSystem
             ResolveInputActions();
         }
 
+        public void SetInputEnabled(bool enabled)
+        {
+            _inputEnabled = enabled;
+            ApplyInputMapState();
+        }
+
         private void OnEnable()
         {
             if (_resetAction != null)
                 _resetAction.performed += HandleResetPerformed;
 
-            _managementCameraMap?.Enable();
+            ApplyInputMapState();
         }
 
         private void OnDisable()
@@ -84,6 +91,17 @@ namespace LasDetox.CameraSystem
                 _resetAction.performed -= HandleResetPerformed;
 
             _managementCameraMap?.Disable();
+        }
+
+        private void ApplyInputMapState()
+        {
+            if (_managementCameraMap == null)
+                return;
+
+            if (_inputEnabled && isActiveAndEnabled)
+                _managementCameraMap.Enable();
+            else
+                _managementCameraMap.Disable();
         }
 
         private void Update()

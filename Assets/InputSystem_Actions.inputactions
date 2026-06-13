@@ -1146,6 +1146,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "GameUI",
+            "id": "f1e2d3c4-b5a6-7890-cdef-123456789abc",
+            "actions": [
+                {
+                    "name": "TogglePatientRoster",
+                    "type": "Button",
+                    "id": "a2b3c4d5-e6f7-8901-abcd-234567890abc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ClosePatientRoster",
+                    "type": "Button",
+                    "id": "b3c4d5e6-f7a8-9012-bcde-345678901bcd",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "c4d5e6f7-a8b9-0123-cdef-456789012cde",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "TogglePatientRoster",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d5e6f7a8-b9c0-1234-def0-567890123def",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ClosePatientRoster",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
