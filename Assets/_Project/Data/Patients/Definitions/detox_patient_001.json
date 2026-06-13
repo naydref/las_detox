@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "detox_patient_001",
+  "visualProfileId": null,
+  "identity": {
+    "firstName": "Jan",
+    "lastName": "Kowalski",
+    "dateOfBirth": "1985-03-14",
+    "sex": "male"
+  },
+  "administrativeProfile": {
+    "city": "Warszawa",
+    "emergencyContact": {
+      "name": "Anna Kowalska",
+      "relationship": "spouse",
+      "phone": "+48 600 000 001"
+    }
+  },
+  "background": {
+    "occupation": "Magazynier",
+    "employmentStatus": "employed",
+    "relationshipStatus": "married",
+    "housingStatus": "stable",
+    "shortBio": "Od lat pracuje na zmiany; problem z alkoholem nasilał się po utracie nadzorowanego stanowiska."
+  },
+  "addictionHistory": {
+    "knownSubstances": ["alcohol"],
+    "primaryLongTermSubstance": "alcohol",
+    "yearsOfUse": 12,
+    "previousDetoxCount": 2,
+    "previousTherapyCount": 1,
+    "longestAbstinenceDays": 45,
+    "previousTreatmentCompleted": false,
+    "historySummary": "Kilkukrotnie rozpoczynał leczenie ambulatoryjne, nie dokończył ostatniego programu."
+  },
+  "medicalBackground": {
+    "chronicConditions": ["hypertension"],
+    "allergies": ["penicillin"]
+  },
+  "personality": {
+    "sociability": 0.45,
+    "impulsivity": 0.85,
+    "ruleCompliance": 0.35,
+    "conflictTendency": 0.90,
+    "manipulativeness": 0.40,
+    "helpSeeking": 0.30
+  },
+  "behaviorProfile": {
+    "queuePatience": 0.15,
+    "authorityTolerance": 0.25,
+    "groupParticipation": 0.40,
+    "isolationPreference": 0.30,
+    "contrabandRisk": 0.35,
+    "earlyDischargeRisk": 0.55
+  },
+  "presentation": {
+    "shortDescription": "Od pierwszych minut sprawia wrażenie napiętego i gotowego do sprzeczki.",
+    "visibleTraits": ["loud", "restless"],
+    "hiddenTraits": ["fearful"]
+  },
+  "tags": ["conflict_prone", "alcohol_use_disorder"]
+}

@@ -2,20 +2,40 @@
 
 | Pole | Wartość |
 | :--- | :--- |
-| **Status projektu** | Wczesny prototyp — Prototype 0.2 jako zapisany i zweryfikowany checkpoint; obejmuje greybox parteru Detoxu, harmonogram dnia powszedniego oraz działającą kamerę management |
-| **Gałąź** | `main` (do przodu względem `origin/main` o 1 commit — `1348cc0` nie wypchnięty) |
+| **Status projektu** | Wczesny prototyp — Prototype 0.3A (Patient Data Loader) zaimplementowany lokalnie; oczekuje commita i weryfikacji Play Mode |
+| **Gałąź** | `main` (zsynchronizowany z `origin/main` na commicie `d9cae49`; implementacja 0.3A niezacommitowana) |
 | **Data aktualizacji dokumentu** | 13.06.2026 |
-| **Ostatni zapisany commit w repo** | `1348cc0` (`1348cc0ba193d6ae11fbfe9636eab249ca7fbdd4`) — *Add management camera vertical slice for Detox ground floor* |
-| **Aktualny stabilny checkpoint** | `1348cc0` (`1348cc0ba193d6ae11fbfe9636eab249ca7fbdd4`) — *Add management camera vertical slice for Detox ground floor* |
-| **Oznaczenie wersji roboczej** | Prototype 0.2 |
+| **Ostatni zapisany commit w repo** | `d9cae49` (`d9cae49…`) — *Update control version for Prototype 0.2 checkpoint* |
+| **Aktualny stabilny checkpoint** | `d9cae49` — dokumentacja Prototype 0.2; ostatni commit implementacyjny: `1348cc0` (kamera management) |
+| **Oznaczenie wersji roboczej** | Prototype 0.3A — Patient Data Loader v0.1 (lokalnie) |
 
 ---
 
 ## 2. Aktualny stabilny checkpoint
 
-**Commit:** `1348cc0` — *Add management camera vertical slice for Detox ground floor*
+**Ostatni zapisany commit implementacyjny:** `1348cc0` — *Add management camera vertical slice for Detox ground floor*
 
-**Zakres (harmonogram + kamera management):**
+**Wersja robocza (niezacommitowana):** Prototype 0.3A — Patient Data Loader v0.1
+
+### Patient Data Loader (Prototype 0.3A — lokalnie)
+
+- `PatientDataLoader` — [`Assets/_Project/Scripts/Patients/PatientDataLoader.cs`](Assets/_Project/Scripts/Patients/PatientDataLoader.cs), namespace `LasDetox.Patients`
+- `PatientDefinitionDto`, `PatientCatalogDto`, `PatientDefinitionValidator` — deserializacja `JsonUtility`, walidacja sekcji/stringów/enumów/zakresów
+- Katalog [`Assets/_Project/Data/Patients/Catalogs/detox_patients_catalog.json`](Assets/_Project/Data/Patients/Catalogs/detox_patients_catalog.json) — 3 ID w ustalonej kolejności
+- 3 definicje JSON w [`Assets/_Project/Data/Patients/Definitions/`](Assets/_Project/Data/Patients/Definitions/) — pacjenci testowi (konfliktowy / wycofany / manipulacyjny)
+- [`Assets/_Project/Data/Patients/README_PATIENT_DATA.md`](Assets/_Project/Data/Patients/README_PATIENT_DATA.md) — dokumentacja autora danych
+- `TextAsset` + jawne referencje w Inspectorze na `Systems` → `PatientDataLoader`
+- Loader: jednorazowa deserializacja → `Dictionary<string, PatientDefinitionDto>` → iteracja katalogu → `ValidPatients` + log podsumowania
+- **Granica JsonUtility v0.1:** walidator nie wykrywa brakujących kluczy liczbowych/boolean vs `0`/`false`
+- **Bez zmian:** Input System, kamera, UI, przyjęcia, runtime state pacjenta
+
+**Weryfikacja 0.3A (13.06.2026):**
+
+- Offline: struktura JSON 3 pacjentów OK (Python smoke test)
+- Unity batch compile: niedostępny (projekt otwarty w edytorze) — **wymagany Play Mode w Unity**
+- Oczekiwany log: `[PatientData] Loaded 3 patients, 0 errors.`
+
+**Checkpoint Prototype 0.2 (`1348cc0` / `d9cae49`):**
 
 ### Harmonogram (dziedziczone z `09e83e6`)
 
@@ -86,9 +106,11 @@ Poniższe elementy są obecne w repozytorium na checkpointcie `1348cc0`:
 | **Reset Home** | Przywraca `_initialFocusPoint` i `_initialZoomDistance` |
 | **Stała rotacja kamery** | Stały pitch i yaw — brak orbitowania i obrotu runtime |
 | **Serializowane bounds kamery** | `_boundsMin`, `_boundsMax`, `_boundsPadding` — bez collidera / `CameraBounds` |
-| **Brak regresji harmonogramu** | `ScheduleDebugPanel` i harmonogram działają podczas testu Play Mode |
+| **`PatientDataLoader`** | Ładuje katalog + 3 definicje JSON; walidacja; `ValidPatients` w kolejności katalogu; log `[PatientData] Loaded N patients, E errors.` |
+| **Dane pacjentów v0.1** | JSON w `Assets/_Project/Data/Patients/`; katalog ID; 3 testowe definicje |
+| **Brak regresji harmonogramu / kamery / debug UI** | Zakres 0.3A nie modyfikuje istniejących systemów poza dodaniem komponentu na `Systems` |
 
-**Poza zakresem (brak w repo):** Patient AI, NavMesh, system potrzeb, kolejki, konflikty, docelowe wyposażenie, produkcyjny HUD, ekonomia, przyjęcia/wypisy, kalendarz niedziel i świąt. Wdrożenie kamery **nie oznacza** rozpoczęcia żadnego z tych systemów.
+**Poza zakresem (brak w repo):** Patient Roster UI (0.3B), Patient AI, NavMesh, system potrzeb, kolejki, konflikty, docelowe wyposażenie, produkcyjny HUD, ekonomia, przyjęcia/wypisy, kalendarz niedziel i świąt.
 
 ---
 
@@ -106,7 +128,7 @@ Scena jest **composition rootem** vertical slice — systemy gry są podpięte b
 | `Directional Light` | Oświetlenie |
 | `Environment` | `Ground Placeholder` + `Rooms` (greybox parteru) |
 | `Props` | Kontener na rekwizyty (obecnie pusty) |
-| `Systems` | `GameClock` + `ScheduleRunner` (jeden GameObject, dwa komponenty) |
+| `Systems` | `GameClock` + `ScheduleRunner` + `PatientDataLoader` (jeden GameObject, trzy komponenty) |
 | `DebugUI` | `ScheduleDebugPanel` (tworzy `DebugCanvas` w runtime) |
 
 **`Environment/Rooms`:** Detox Common Room, Corridor Vertical, Corridor Horizontal, Nurse Station, Laundry, Patient Room 1–4, Shared Walls.
@@ -148,6 +170,10 @@ Obiekt `CameraBounds` **nie istnieje** w scenie.
 | `Schedule/ScheduleRunner.cs` | `LasDetox.Schedule` | Runner harmonogramu |
 | `Debug/ScheduleDebugPanel.cs` | `LasDetox.Debugging` | Panel debugowy uGUI |
 | `Camera/ManagementCameraController.cs` | `LasDetox.CameraSystem` | Kamera management |
+| `Patients/PatientDataLoader.cs` | `LasDetox.Patients` | Loader danych pacjentów z JSON |
+| `Patients/PatientDefinitionDto.cs` | `LasDetox.Patients` | DTO definicji pacjenta |
+| `Patients/PatientCatalogDto.cs` | `LasDetox.Patients` | DTO katalogu ID |
+| `Patients/PatientDefinitionValidator.cs` | `LasDetox.Patients` | Walidacja definicji i katalogu |
 
 ### Narzędzia (`Tools/`)
 
@@ -177,6 +203,7 @@ Narzędzia **nie uruchamiają** Unity i **nie modyfikują** plików projektu.
 
 Najważniejsze systemy poza aktualnym checkpointem (planowane, niezaimplementowane):
 
+- **Patient Roster UI** — panel listy i szczegółów (Prototype 0.3B)
 - **Patient AI** — zachowanie i decyzje pacjentów
 - **NavMesh i poruszanie postaci** — locomotion, pathfinding
 - **System potrzeb** — głód, stres, uzależnienie itd.
@@ -196,12 +223,15 @@ Stan na **13.06.2026** (zweryfikować przez `git status`):
 
 | Plik / katalog | Status | Uwagi |
 | :--- | :--- | :--- |
-| `CONTROL_VERSION.md` | Zmodyfikowany | Niniejsza aktualizacja — oczekuje na commit dokumentacyjny |
+| `CONTROL_VERSION.md` | Zmodyfikowany | Aktualizacja Prototype 0.3A — oczekuje na commit dokumentacyjny |
+| `Assets/_Project/Data/Patients/` | Nieśledzony | Implementacja 0.3A — JSON + README |
+| `Assets/_Project/Scripts/Patients/` | Nieśledzony | Implementacja 0.3A — 4 skrypty C# |
+| `Assets/_Project/Scenes/DetoxPrototype.unity` | Zmodyfikowany | `PatientDataLoader` na `Systems` |
 | `ProjectSettings/ShaderGraphSettings.asset` | Zmodyfikowany lokalnie | Artefakt edytora Unity — poza zakresem |
-| `.cursor/` | Nieśledzony | Plany i konfiguracja IDE Cursor — lokalne, nie commitować |
-| `ProjectSettings/SceneTemplateSettings.json` | Nieśledzony | Plik ustawień edytora — typowo lokalny artefakt |
+| `.cursor/` | Nieśledzony | Plany Cursor — lokalne, nie commitować |
+| `ProjectSettings/SceneTemplateSettings.json` | Nieśledzony | Artefakt edytora — poza zakresem |
 
-Pliki implementacji kamery (`ManagementCameraController`, `InputSystem_Actions`, `DetoxPrototype.unity`) są zapisane w commicie `1348cc0` i **nie oczekują** na commit.
+Implementacja 0.3A **oczekuje** na precyzyjny commit (patrz plan — bez `git add .`).
 
 **Zasada:** Nie używać `git add .`. Dodawać pliki precyzyjnie, po przejrzeniu `git status` i `git diff`.
 
@@ -281,7 +311,9 @@ git switch -c recovery/schedule-slice 09e83e6
 
 | Commit | Opis | Znaczenie | Status |
 | :--- | :--- | :--- | :--- |
-| `1348cc0` | Add management camera vertical slice for Detox ground floor | Prototype 0.2: kamera management, mapa `ManagementCamera`, podpięcie na `Main Camera`; dziedziczy zakres harmonogramu | **Aktualny stabilny checkpoint — Prototype 0.2** |
+| *(pending)* | Add patient data loader vertical slice (Prototype 0.3A) | JSON katalog + 3 definicje, loader, walidator, scena | **Roboczy — niezacommitowany** |
+| `d9cae49` | Update control version for Prototype 0.2 checkpoint | Dokumentacja checkpointu 0.2 | Potwierdzony |
+| `1348cc0` | Add management camera vertical slice for Detox ground floor | Prototype 0.2: kamera management | Potwierdzony |
 | `9afb4d9` | Add project version control document | Dokument `CONTROL_VERSION.md` | Potwierdzony |
 | `09e83e6` | Add detox schedule simulation vertical slice | Pierwszy działający vertical slice: zegar gry, harmonogram dnia powszedniego, runner, panel debugowy, walidator Python | Wcześniejszy checkpoint harmonogramu |
 | `8f090d6` | Add Unity scene layout reporting tool | Narzędzie `scene_layout_report.py` do audytu layoutu sceny bez Unity | Potwierdzony |
@@ -295,9 +327,9 @@ git switch -c recovery/schedule-slice 09e83e6
 
 ## 13. Następny bezpieczny krok
 
-1. Zaktualizować i zacommitować `CONTROL_VERSION.md` (niniejsza wersja dokumentu).
-2. Wypchnąć commity (`9afb4d9` dokumentacji + `1348cc0` kamery, oraz commit dokumentacyjny) — dopiero po decyzji Operatora.
-3. Potwierdzić świadomie nieczysty working tree (artefakty edytora poza zakresem).
-4. Wybrać kolejny mały vertical slice na bazie checkpointu `1348cc0`.
+1. **Play Mode w Unity** — potwierdzić log `[PatientData] Loaded 3 patients, 0 errors.` oraz brak regresji harmonogramu/debug/kamery.
+2. Zacommitować implementację 0.3A precyzyjnym `git add` (patrz plan Prototype 0.3A).
+3. Zacommitować `CONTROL_VERSION.md` (osobny commit dokumentacyjny lub po akceptacji Operatora).
+4. Wybrać **Prototype 0.3B — Patient Roster UI** jako kolejny slice po zamknięciu 0.3A.
 
-> Kolejny system gameplay powinien powstawać jako osobny, mały vertical slice na bazie aktualnego stabilnego checkpointu `1348cc0`.
+> Kolejny slice UI powinien czytać `PatientDataLoader.ValidPatients` bez zmiany loadera.

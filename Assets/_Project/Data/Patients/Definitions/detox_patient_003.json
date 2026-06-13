@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "detox_patient_003",
+  "visualProfileId": null,
+  "identity": {
+    "firstName": "Tomasz",
+    "lastName": "Wiśniewski",
+    "dateOfBirth": "1988-07-22",
+    "sex": "male"
+  },
+  "administrativeProfile": {
+    "city": "Gdańsk",
+    "emergencyContact": {
+      "name": "Piotr Mazur",
+      "relationship": "friend",
+      "phone": "+48 600 000 003"
+    }
+  },
+  "background": {
+    "occupation": "Handlowiec",
+    "employmentStatus": "self_employed",
+    "relationshipStatus": "partnered",
+    "housingStatus": "stable",
+    "shortBio": "Na co dzień sprawia wrażenie kontaktowego i opanowanego; w przeszłości łączył alkohol z innymi substancjami."
+  },
+  "addictionHistory": {
+    "knownSubstances": ["alcohol", "benzodiazepines", "cannabis"],
+    "primaryLongTermSubstance": "alcohol",
+    "yearsOfUse": 10,
+    "previousDetoxCount": 1,
+    "previousTherapyCount": 2,
+    "longestAbstinenceDays": 90,
+    "previousTreatmentCompleted": true,
+    "historySummary": "Kilkukrotnie przechodził krótkie programy; ostatni zakończył formalnie, ale szybko wrócił do picia."
+  },
+  "medicalBackground": {
+    "chronicConditions": [],
+    "allergies": ["latex"]
+  },
+  "personality": {
+    "sociability": 0.80,
+    "impulsivity": 0.45,
+    "ruleCompliance": 0.70,
+    "conflictTendency": 0.35,
+    "manipulativeness": 0.85,
+    "helpSeeking": 0.55
+  },
+  "behaviorProfile": {
+    "queuePatience": 0.60,
+    "authorityTolerance": 0.75,
+    "groupParticipation": 0.70,
+    "isolationPreference": 0.25,
+    "contrabandRisk": 0.75,
+    "earlyDischargeRisk": 0.40
+  },
+  "presentation": {
+    "shortDescription": "Od pierwszego spotkania wydaje się uprzejmy i współpracujący.",
+    "visibleTraits": ["charming", "cooperative"],
+    "hiddenTraits": ["deceptive"]
+  },
+  "tags": ["mixed_substance_history", "manipulative"]
+}

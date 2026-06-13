@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "patientIds": [
+    "detox_patient_001",
+    "detox_patient_002",
+    "detox_patient_003"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "detox_patient_002",
+  "visualProfileId": null,
+  "identity": {
+    "firstName": "Ewa",
+    "lastName": "Nowak",
+    "dateOfBirth": "1992-11-08",
+    "sex": "female"
+  },
+  "administrativeProfile": {
+    "city": "Kraków",
+    "emergencyContact": null
+  },
+  "background": {
+    "occupation": null,
+    "employmentStatus": "unemployed",
+    "relationshipStatus": "single",
+    "housingStatus": "temporary",
+    "shortBio": "Po utracie pracy coraz częściej sięga po leki nasenne; unika kontaktu z rodziną."
+  },
+  "addictionHistory": {
+    "knownSubstances": ["benzodiazepines"],
+    "primaryLongTermSubstance": "benzodiazepines",
+    "yearsOfUse": 6,
+    "previousDetoxCount": 1,
+    "previousTherapyCount": 0,
+    "longestAbstinenceDays": 21,
+    "previousTreatmentCompleted": false,
+    "historySummary": "Leczenie ambulatoryjne przerwała po kilku tygodniach; ostatni rok głównie samodzielne odstawianie."
+  },
+  "medicalBackground": {
+    "chronicConditions": ["anxiety_disorder"],
+    "allergies": []
+  },
+  "personality": {
+    "sociability": 0.20,
+    "impulsivity": 0.25,
+    "ruleCompliance": 0.80,
+    "conflictTendency": 0.15,
+    "manipulativeness": 0.20,
+    "helpSeeking": 0.15
+  },
+  "behaviorProfile": {
+    "queuePatience": 0.55,
+    "authorityTolerance": 0.70,
+    "groupParticipation": 0.10,
+    "isolationPreference": 0.85,
+    "contrabandRisk": 0.10,
+    "earlyDischargeRisk": 0.20
+  },
+  "presentation": {
+    "shortDescription": "Trzyma się cienia, odpowiada krótko i rzadko inicjuje rozmowę.",
+    "visibleTraits": ["quiet", "withdrawn"],
+    "hiddenTraits": ["anxious"]
+  },
+  "tags": ["withdrawn", "benzodiazepine_dependence"]
+}
