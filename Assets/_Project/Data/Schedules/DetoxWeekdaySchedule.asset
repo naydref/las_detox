@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5f6a7b8c9d0412390a1b2c3d4e5f604, type: 3}
+  m_Name: DetoxWeekdaySchedule
+  m_EditorClassIdentifier: Assembly-CSharp::LasDetox.Schedule.DailySchedule
+  Entries:
+  - Hour: 6
+    Minute: 0
+    DisplayName: "Początek aktywnego cyklu / radio"
+    Description: "Radio w sali kominkowej. Pilot TV dostępny dopiero od 15:30."
+    EventType: 1
+    DurationMinutes: 0
+  - Hour: 7
+    Minute: 0
+    DisplayName: Pobudka
+    Description: Oficjalny start dnia na Detoxie.
+    EventType: 2
+    DurationMinutes: 0
+  - Hour: 8
+    Minute: 0
+    DisplayName: Sniadanie
+    Description: Poranny posilek w jadalni.
+    EventType: 3
+    DurationMinutes: 30
+  - Hour: 8
+    Minute: 30
+    DisplayName: Kawa po sniadaniu
+    Description: Pierwsza kawa. Kolejka do dyzurki.
+    EventType: 4
+    DurationMinutes: 0
+  - Hour: 9
+    Minute: 0
+    DisplayName: Leki
+    Description: Poranny rozklad lekow.
+    EventType: 5
+    DurationMinutes: 0
+  - Hour: 9
+    Minute: 15
+    DisplayName: Grupa motywacyjna
+    Description: Zajecia grupowe do 10:50.
+    EventType: 6
+    DurationMinutes: 95
+  - Hour: 11
+    Minute: 0
+    DisplayName: Spacer
+    Description: Godzinny spacer na zewnatrz.
+    EventType: 7
+    DurationMinutes: 60
+  - Hour: 12
+    Minute: 0
+    DisplayName: Czas wolny
+    Description: Nominalny czas wolny do obiadu.
+    EventType: 8
+    DurationMinutes: 120
+  - Hour: 14
+    Minute: 0
+    DisplayName: Obiad
+    Description: Posilek poludniowy.
+    EventType: 9
+    DurationMinutes: 30
+  - Hour: 14
+    Minute: 30
+    DisplayName: Kawa po obiedzie
+    Description: Druga kawa. Kolejka do dyzurki.
+    EventType: 10
+    DurationMinutes: 0
+  - Hour: 15
+    Minute: 0
+    DisplayName: Leki
+    Description: Popoludniowy rozklad lekow.
+    EventType: 5
+    DurationMinutes: 0
+  - Hour: 15
+    Minute: 30
+    DisplayName: Dostep do pilota TV
+    Description: Pilot TV dostepny w sali kominkowej.
+    EventType: 11
+    DurationMinutes: 0
+  - Hour: 16
+    Minute: 0
+    DisplayName: Spacer
+    Description: Krotki spacer poludniowy.
+    EventType: 7
+    DurationMinutes: 30
+  - Hour: 16
+    Minute: 30
+    DisplayName: Czas wolny
+    Description: Wolny czas do kolacji.
+    EventType: 8
+    DurationMinutes: 150
+  - Hour: 19
+    Minute: 0
+    DisplayName: Kolacja
+    Description: Wieczorny posilek.
+    EventType: 12
+    DurationMinutes: 30
+  - Hour: 19
+    Minute: 30
+    DisplayName: Czas wolny po kolacji
+    Description: Wolny czas do ciszy nocnej.
+    EventType: 13
+    DurationMinutes: 150
+  - Hour: 22
+    Minute: 0
+    DisplayName: Cisza nocna
+    Description: Cisza nocna do 06:00.
+    EventType: 0
+    DurationMinutes: 480
